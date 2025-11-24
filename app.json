@@ -20,10 +20,38 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "CAMERA",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE",
+        "READ_CALENDAR",
+        "WRITE_CALENDAR",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
+      "package": "com.pedroricardost.minitour"
     },
+    
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+       [
+          "expo-location",
+          {
+            "locationAlwaysAndWhenInUsePermission": "Precisamos da sua localização para registrar visitas.",
+            "locationWhenInUsePermission": "Precisamos da sua localização para registrar visitas."
+          }
+      ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "54f0f1f2-6f32-4673-b348-8b28b33b3b62"
+      }
     }
   }
 }
