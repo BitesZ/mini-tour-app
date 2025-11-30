@@ -17,4 +17,4 @@ No terminal da IDE navegue para a pasta do projeto: `cd mini-tour` e execute `np
 
 ## Execução
 
-usar `npx expo start`
+No terminal usar `npx expo start`
