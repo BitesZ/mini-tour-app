@@ -9,7 +9,8 @@ import * as Calendar from "expo-calendar";
 import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as MediaLibrary from "expo-media-library";
+import { saveTourRemote } from "../services/TourService";
+
 
 export default function tour_register() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -23,6 +24,17 @@ export default function tour_register() {
   const [description, setDescription] = useState("");
 
   const db = useSQLiteContext();
+  const [useRemoteDB, setUseRemoteDB] = useState(false);
+
+  useEffect(() => {
+  (async () => {
+    const saved = await AsyncStorage.getItem("selectedDBMode");
+    if (saved) {
+      setUseRemoteDB(saved === "remote");
+    }
+  })();
+}, []);
+
 
   // Tirar foto
   const handleTakePhoto = async () => {
@@ -112,11 +124,30 @@ export default function tour_register() {
     const date = new Date().toISOString();
     await saveToCalendar(description);
 
+    //SALVAR NO SQLITE (local)
     await db.runAsync(
       `INSERT INTO tours (user_id, photo_uri, latitude, longitude, description, date) 
        VALUES (?, ?, ?, ?, ?, ?)`,
       [user_id, photo, location.latitude, location.longitude, description, date]
     );
+
+    //SALVAR NO FIRESTORE (remoto)
+    const tourData = {
+      user_id,
+      photo_uri: photo,       
+      latitude: location.latitude,
+      longitude: location.longitude,
+      description,
+      date,
+    };
+
+    if (useRemoteDB) {
+      try {
+        await saveTourRemote(tourData);
+      } catch (err) {
+        console.log("Erro ao salvar remotamente:", err);
+      }
+    }
 
     Alert.alert("Sucesso", "Registro salvo!");
     router.replace("/tour");
@@ -194,73 +225,76 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 18,
-    backgroundColor: "#f7f7f7",
-    gap: 16,
+    backgroundColor: "#fff",
+    gap: 20,
+    alignItems: "center",
   },
 
   preview: {
     width: "100%",
     height: 220,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#ddd",
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "#6db5e855",
   },
 
   previewPlaceholder: {
     width: "100%",
     height: 220,
-    backgroundColor: "#e6e6e6",
-    borderRadius: 12,
+    backgroundColor: "#eef6fc",
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     borderStyle: "dashed",
     borderWidth: 2,
-    borderColor: "#bbb",
+    borderColor: "#6db5e8",
   },
 
   map: {
     width: "100%",
     height: 220,
-    borderRadius: 12,
+    borderRadius: 20,
     overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "#ddd",
+    borderWidth: 2,
+    borderColor: "#6db5e855",
   },
 
   input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#6db5e855",
+    padding: 14,
+    borderRadius: 12,
     backgroundColor: "#fff",
     fontSize: 16,
+    width: "100%",
   },
 
   btn: {
     backgroundColor: "#6db5e8",
-    paddingVertical: 14,
-    borderRadius: 10,
+    paddingVertical: 16,
+    borderRadius: 14,
     alignItems: "center",
-    elevation: 5,
+    width: "100%",
+    elevation: 3,
   },
 
   btnText: {
     color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 17,
+    fontWeight: "700",
   },
 
   saveBtn: {
     backgroundColor: "#2ecc71",
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: 18,
+    borderRadius: 14,
     alignItems: "center",
     elevation: 3,
-    marginTop: 8,
+    width: "100%",
   },
 
   saveBtnText: {
-    fontSize: 17,
+    fontSize: 18,
     color: "#fff",
     fontWeight: "700",
   },
@@ -289,17 +323,17 @@ const styles = StyleSheet.create({
   },
 
   captureBtn: {
-    width: 75,
-    height: 75,
+    width: 80,
+    height: 80,
     backgroundColor: "#fff",
-    borderRadius: 40,
+    borderRadius: 50,
     borderWidth: 6,
     borderColor: "#ddd",
   },
 
   cancelBtn: {
     position: "absolute",
-    top: 40,
+    top: 50,
     left: 20,
     padding: 10,
   },
@@ -307,6 +341,6 @@ const styles = StyleSheet.create({
   cancelText: {
     color: "#fff",
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: "700",
   },
 });
