@@ -8,6 +8,7 @@ Aplicativo mobile com a proposta de registrar visitas em locais, utilizando banc
 - Expo
 - Expo Router
 - SQLite
+- Firebase/Firestore
 - Async Storage
 
 ## Instalação
