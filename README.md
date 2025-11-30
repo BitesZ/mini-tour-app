@@ -1,1 +1,21 @@
-# mini-tour-app
+# Mini-Tour
+
+Aplicativo mobile com a proposta de registrar visitas em locais, utilizando banco de dados local.
+
+## Tecnologias
+
+- React Native
+- Expo
+- Expo Router
+- SQLite
+- Firebase/Firestore
+- Async Storage
+
+## Instalação
+Na raiz da pasta do projeto, crie um arquivo chamado `firebaseConfig.js` e configure de acordo com o `firebaseConfig-example.js`
+
+No terminal da IDE navegue para a pasta do projeto: `cd mini-tour` e execute `npm install`
+
+## Execução
+
+No terminal usar `npx expo start`
